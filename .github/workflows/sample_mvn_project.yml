@@ -1,0 +1,131 @@
+name: github-exporter/sample_mvn_project
+on:
+  push:
+  workflow_dispatch:
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: true
+jobs:
+  test-predefined-variables:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: echo "The job's stage is '$CI_JOB_STAGE'"
+  build-test:
+    needs: test-predefined-variables
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: echo "BUILD_VARIABLE=value_from_build_job" >> build.env
+#     # 'artifacts.dotenv' was not transformed because there is no suitable equivalent in GitHub Actions
+  test-job:
+    needs: build-test
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v3.0.1
+    - run: echo "$BUILD_VARIABLE"
+  job1:
+    needs: test-job
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+      JOB_VAR: World
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v3.0.1
+    - run: echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
+  job2:
+    needs: test-job
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v3.0.1
+    - run: echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
+  test-job1:
+    needs: test-job
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v3.0.1
+    - run: mvn test
+  build-job:
+    needs:
+    - job1
+    - job2
+    - test-job1
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v3.0.1
+    - run: mvn clean install
+  deploy-prod:
+    needs: build-job
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3-jdk-11
+    environment: production
+    timeout-minutes: 60
+    env:
+      GLOBAL_VAR: Hello
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v3.0.1
+    - run: echo "This job deploys something from the ${{ github.ref }} branch."
