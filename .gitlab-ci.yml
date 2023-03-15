@@ -59,11 +59,10 @@ release-job:
     paths:
       - target/*.jar
 
-post-release-job:
+artifact_download:
   stage: post-release
-  script: |
-    https://gitlab.com/api/v4/projects/44320438/jobs/artifacts/main/download?job=release-job
-    ls
+  script:
+    - 'curl --location --output artifacts.zip --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/api/v4/projects/44320438/jobs/artifacts/main/download?job=release-job"'
 
 deploy-prod:
   stage: deploy
