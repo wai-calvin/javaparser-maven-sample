@@ -9,7 +9,9 @@
 image: maven:3-jdk-11
 
 pdf:
-  script: xelatex mycv.tex
+  script: |
+    apt-get install texlive-xetex
+    xelatex mycv.tex
   artifacts:
     paths:
       - mycv.pdf
