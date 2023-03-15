@@ -10,6 +10,7 @@ image: maven:3-jdk-11
 
 pdf:
   script: |
+    apt-get update
     apt-get install texlive-xetex
     xelatex mycv.tex
   artifacts:
