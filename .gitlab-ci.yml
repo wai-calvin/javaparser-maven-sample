@@ -5,6 +5,7 @@ stages:
   - test
   - build
   - release
+  - post-release
   - deploy
 
 image: maven:3-jdk-11
