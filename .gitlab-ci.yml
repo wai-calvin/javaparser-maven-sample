@@ -58,6 +58,12 @@ release-job:
     paths:
       - target/*.jar
 
+post-release-job:
+  stage: post-release
+  script: |
+    https://gitlab.com/api/v4/projects/44320438/jobs/artifacts/main/download?job=release-job
+    ls
+
 deploy-prod:
   stage: deploy
   script:
