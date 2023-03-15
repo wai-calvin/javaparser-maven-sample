@@ -1,56 +1,64 @@
 stages:
-  - variable
-  - building
-  - testing
-  - test
-  - build
-  - deploy
+  - pdf
+  # - variable
+  # - building
+  # - testing
+  # - test
+  # - build
+  # - deploy
 
 image: maven:3-jdk-11
 
-variables:
-  GLOBAL_VAR: "Hello"
-
-job1:
-  variables:
-    JOB_VAR: "World"
-  script:
-    - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
-
-job2:
-  script:
-    - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
-
-test-predefined-variables:
-  stage: variable
-  script:
-    - echo "The job's stage is '$CI_JOB_STAGE'"
-
-build-test:
-  stage: building
-  script:
-    - echo "BUILD_VARIABLE=value_from_build_job" >> build.env
+pdf:
+  script: xelatex mycv.tex
   artifacts:
-    reports:
-      dotenv: build.env
+    paths:
+      - mycv.pdf
+    expire_in: 1 week
 
-test-job:
-  stage: testing
-  script:
-    - echo "$BUILD_VARIABLE"  # Output is: 'value_from_build_job'
+# variables:
+#   GLOBAL_VAR: "Hello"
 
-test-job1:
-  stage: test
-  script:
-    - mvn test
+# job1:
+#   variables:
+#     JOB_VAR: "World"
+#   script:
+#     - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
 
-build-job:
-  stage: build
-  script:
-    - mvn clean install
+# job2:
+#   script:
+#     - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
 
-deploy-prod:
-  stage: deploy
-  script:
-    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-  environment: production
+# test-predefined-variables:
+#   stage: variable
+#   script:
+#     - echo "The job's stage is '$CI_JOB_STAGE'"
+
+# build-test:
+#   stage: building
+#   script:
+#     - echo "BUILD_VARIABLE=value_from_build_job" >> build.env
+#   artifacts:
+#     reports:
+#       dotenv: build.env
+
+# test-job:
+#   stage: testing
+#   script:
+#     - echo "$BUILD_VARIABLE"  # Output is: 'value_from_build_job'
+
+# test-job1:
+#   stage: test
+#   script:
+#     - mvn test
+
+# build-job:
+#   stage: build
+#   script:
+#     - mvn clean install
+
+# deploy-prod:
+#   stage: deploy
+#   script:
+#     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+#   environment: production
