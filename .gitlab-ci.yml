@@ -1,9 +1,43 @@
 stages:
+  - variable
+  - building
+  - testing
   - test
   - build
   - deploy
 
 image: maven:3-jdk-11
+
+variables:
+  GLOBAL_VAR: "Hello"
+
+job1:
+  variables:
+    JOB_VAR: "World"
+  script:
+    - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
+
+job2:
+  script:
+    - echo "Variables are '$GLOBAL_VAR' and '$JOB_VAR'"
+
+test-predefined-variables:
+  stage: variable
+  script:
+    - echo "The job's stage is '$CI_JOB_STAGE'"
+
+build-test:
+  stage: building
+  script:
+    - echo "BUILD_VARIABLE=value_from_build_job" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+test-job:
+  stage: testing
+  script:
+    - echo "$BUILD_VARIABLE"  # Output is: 'value_from_build_job'
 
 test-job1:
   stage: test
